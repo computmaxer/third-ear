@@ -1,0 +1,5 @@
+node_modules/
+replay-out/
+*.tsbuildinfo
+.env
+.DS_Store

@@ -1,0 +1,270 @@
+{
+  "description": "Scripted model replies for sample-meeting.txt (run with --me Max). Each response is used by the first run that starts at or after its time. The script exercises the ledger rules and the report format; it is not a model's real output and not a quality target. See sample-meeting.expected.md for what a good model should raise.",
+  "responses": [
+    {
+      "at": "02:30",
+      "note": "Already answered and unimportant: stopped by the importance floor.",
+      "output": {
+        "raise": [
+          {
+            "kind": "unaddressed",
+            "question": "How many cancellations a day does each clinic get?",
+            "why": "sizes the SMS volume",
+            "evidence": [{ "speaker": "Dana", "quote": "they get maybe eight to ten cancellations a day" }],
+            "importance": 2
+          }
+        ],
+        "resolve": [],
+        "update": [],
+        "drop": [],
+        "bigIdeas": [
+          "Offer slots freed by cancellations to waitlisted clients automatically, with no front desk work",
+          "The waitlist is in the PMS (client, pet, appointment type, preferred vet, date added) and readable through its API"
+        ]
+      }
+    },
+    {
+      "at": "04:00",
+      "note": "Planted ambiguity A1.",
+      "output": {
+        "raise": [
+          {
+            "kind": "ambiguity",
+            "question": "Does 'close by' mean clients waitlisted at that clinic, or clients within some travel distance of it?",
+            "why": "decides whether matching needs client locations",
+            "evidence": [{ "speaker": "Dana", "quote": "we'd only offer it to people who are close by" }],
+            "importance": 4
+          }
+        ],
+        "resolve": [],
+        "update": [],
+        "drop": [],
+        "bigIdeas": [
+          "Offer slots freed by cancellations to waitlisted clients automatically, with no front desk work",
+          "The waitlist is in the PMS (client, pet, appointment type, preferred vet, date added) and readable through its API"
+        ]
+      }
+    },
+    {
+      "at": "05:00",
+      "note": "An invented quote: stopped by the evidence check.",
+      "output": {
+        "raise": [
+          {
+            "kind": "ambiguity",
+            "question": "Do all clinics share one waitlist, or does each clinic keep its own?",
+            "why": "decides how waitlist entries are scoped",
+            "evidence": [{ "speaker": "Dana", "quote": "all twelve clinics share a single waitlist" }],
+            "importance": 4
+          }
+        ],
+        "resolve": [],
+        "update": [],
+        "drop": []
+      }
+    },
+    {
+      "at": "07:00",
+      "note": "Planted unaddressed concern U2.",
+      "output": {
+        "raise": [
+          {
+            "kind": "unaddressed",
+            "question": "Can a freed slot go to someone waiting for an appointment longer than the slot, such as an hour-long dental in a twenty minute slot?",
+            "why": "matching must compare slot length with appointment duration",
+            "evidence": [
+              { "speaker": "Dana", "quote": "Say a twenty minute slot with Doctor Okafor opens up at ten" },
+              { "speaker": "Dana", "quote": "dentals are like an hour" }
+            ],
+            "importance": 4
+          }
+        ],
+        "resolve": [],
+        "update": [],
+        "drop": [],
+        "bigIdeas": [
+          "Offer slots freed by cancellations to waitlisted clients automatically, with no front desk work",
+          "The waitlist is in the PMS (client, pet, appointment type, preferred vet, date added) and readable through its API",
+          "A slot is time on a vet's calendar, not an appointment type; accepted offers book through the existing booking API with no approval"
+        ]
+      }
+    },
+    {
+      "at": "08:00",
+      "note": "The engineer's own question, answered straight away; here it is stopped by the cooldown.",
+      "output": {
+        "raise": [
+          {
+            "kind": "unaddressed",
+            "question": "Do clients need to confirm their phone number before we text them?",
+            "why": "avoids texting the wrong person",
+            "evidence": [{ "speaker": "me", "quote": "Do we need the client to confirm their phone number first" }],
+            "importance": 3
+          }
+        ],
+        "resolve": [],
+        "update": [],
+        "drop": []
+      }
+    },
+    {
+      "at": "09:50",
+      "note": "Planted ambiguity A2.",
+      "output": {
+        "raise": [
+          {
+            "kind": "ambiguity",
+            "question": "How close to the appointment time does a slot count as 'last-minute' and get left to the front desk?",
+            "why": "the cutoff decides which cancellations the system handles",
+            "evidence": [{ "speaker": "Dana", "quote": "obviously not for last-minute stuff" }],
+            "importance": 3
+          }
+        ],
+        "resolve": [],
+        "update": [],
+        "drop": []
+      }
+    },
+    {
+      "at": "10:30",
+      "note": "Planted contradiction C1. Importance 5 skips the cooldown and, with the budget full, pushes out the weakest open item.",
+      "output": {
+        "raise": [
+          {
+            "kind": "contradiction",
+            "question": "Does an offer go to the whole waitlist at once, or to one client at a time with fifteen minutes each?",
+            "why": "decides the core offer flow and how replies are handled",
+            "evidence": [
+              { "speaker": "Dana", "quote": "we just send it to everybody on the waitlist at once and whoever says yes first gets the slot" },
+              { "speaker": "Priya", "quote": "the first person on the list gets the text, and if they haven't answered in fifteen minutes it moves on to the next person" }
+            ],
+            "importance": 5
+          }
+        ],
+        "resolve": [],
+        "update": [],
+        "drop": []
+      }
+    },
+    {
+      "at": "12:10",
+      "note": "Planted unaddressed concern U1, while the ledger is full: stopped by the budget.",
+      "output": {
+        "raise": [
+          {
+            "kind": "unaddressed",
+            "question": "What happens when a client replies YES after their fifteen minutes are up?",
+            "why": "late replies need a defined outcome and message",
+            "evidence": [{ "speaker": "Priya", "quote": "if they haven't answered in fifteen minutes it moves on to the next person" }],
+            "importance": 4
+          }
+        ],
+        "resolve": [],
+        "update": [],
+        "drop": []
+      }
+    },
+    {
+      "at": "13:00",
+      "note": "A1 is answered; resolving it frees room for U1 in the same run.",
+      "output": {
+        "raise": [
+          {
+            "kind": "unaddressed",
+            "question": "What happens when a client replies YES after their fifteen minutes are up?",
+            "why": "late replies need a defined outcome and message",
+            "evidence": [{ "speaker": "Priya", "quote": "if they haven't answered in fifteen minutes it moves on to the next person" }],
+            "importance": 4
+          }
+        ],
+        "resolve": [
+          {
+            "id": "g1",
+            "how": "Close by means on that clinic's waitlist; there is no distance matching",
+            "evidence": { "speaker": "Dana", "quote": "I just mean they're on the waitlist for that clinic" }
+          }
+        ],
+        "update": [],
+        "drop": []
+      }
+    },
+    {
+      "at": "14:10",
+      "note": "C1 is settled explicitly.",
+      "output": {
+        "raise": [],
+        "resolve": [
+          {
+            "id": "g4",
+            "how": "Agreed: one client at a time, fifteen minutes each, in date-added order",
+            "evidence": { "speaker": "Dana", "quote": "Yes, one at a time, fifteen minutes each" }
+          }
+        ],
+        "update": [],
+        "drop": [],
+        "bigIdeas": [
+          "Offer slots freed by cancellations to waitlisted clients automatically, with no front desk work",
+          "The waitlist is in the PMS (client, pet, appointment type, preferred vet, date added) and readable through its API",
+          "A slot is time on a vet's calendar, not an appointment type; accepted offers book through the existing booking API with no approval",
+          "Offers go to one client at a time, fifteen minutes each, in date-added order, only to that clinic's waitlist",
+          "Weekly Monday 8am email to clinic managers: offers sent, accepted, expired and slots filled, by vet"
+        ]
+      }
+    },
+    {
+      "at": "17:10",
+      "note": "U1 is answered.",
+      "output": {
+        "raise": [],
+        "resolve": [
+          {
+            "id": "g5",
+            "how": "A late YES gets the slot if it is still free; otherwise a sorry text, and the client keeps their place",
+            "evidence": { "speaker": "Priya", "quote": "if someone replies yes after their fifteen minutes are up, we check if the slot's still free" }
+          }
+        ],
+        "update": [],
+        "drop": []
+      }
+    },
+    {
+      "at": "19:00",
+      "note": "Planted implicit decision D1.",
+      "output": {
+        "raise": [
+          {
+            "kind": "implicit_decision",
+            "question": "Are we agreeing that offers go by SMS only, not email or app push as first floated?",
+            "why": "decides which channels to build",
+            "evidence": [
+              { "speaker": "Priya", "quote": "It could be a text, could be an email, could be a push notification in the app" },
+              { "speaker": "Priya", "quote": "let's keep it under one SMS segment" }
+            ],
+            "importance": 3
+          }
+        ],
+        "resolve": [],
+        "update": [],
+        "drop": []
+      }
+    },
+    {
+      "at": "20:00",
+      "note": "A reworded U2 after it expired: stopped by the duplicate guard, which covers closed items too.",
+      "output": {
+        "raise": [
+          {
+            "kind": "unaddressed",
+            "question": "Can a twenty minute slot be offered to someone waiting for an hour-long dental?",
+            "why": "slot length must fit the appointment",
+            "evidence": [{ "speaker": "Dana", "quote": "dentals are like an hour" }],
+            "importance": 4
+          }
+        ],
+        "resolve": [],
+        "update": [],
+        "drop": []
+      }
+    }
+  ]
+}

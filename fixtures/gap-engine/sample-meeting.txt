@@ -1,0 +1,124 @@
+# Synthetic meeting for the gap engine replay tool. All names, clinics and numbers are invented.
+# Dana is the subject matter expert, Priya the product manager, Max the engineer (pass --me Max).
+# See sample-meeting.expected.md for the gaps planted in it.
+
+[00:03] Priya: Okay, I think we're all here. Thanks both. So, um, the goal today is just to get Max up to speed on the waitlist thing so he can start scoping it. Dana, do you want to start with what happens today?
+[00:23] Dana: Hi Max, nice to finally meet you, I've heard your name a lot.
+[00:32] Max: Ha, all good things I hope. Nice to meet you too.
+[00:41] Dana: Sure. So right now, when someone cancels, the front desk gets the cancellation, and then if they remember, they open the waitlist and start phoning people. And honestly half the time they don't remember, or it's a busy morning, and the slot just sits there empty.
+[01:04] Dana: And an empty slot is, I mean, that's money. A vet sitting there for half an hour with nothing booked. Across twelve clinics it adds up really fast.
+[01:21] Max: How many cancellations are we talking about, roughly?
+[01:26] Dana: It depends on the clinic, but the bigger ones, like Riverside and Eastgate, they get maybe eight to ten cancellations a day. The small ones it's more like two or three.
+[01:43] Priya: And we have the numbers on how many of those get refilled, it's under a third. So the idea is, when an appointment's cancelled, the system offers the slot to people on the waitlist automatically, and nobody at the front desk has to do anything.
+[02:08] Priya: In terms of how we reach them, I'm kind of open. It could be a text, could be an email, could be a push notification in the app. We can figure that out.
+[02:26] Max: Okay. And the waitlist itself, where does that live? Is it in the practice management system or is it like a spreadsheet somewhere?
+[02:40] Dana: It's in the PMS now. We moved it in last year. There's a waitlist table, and each entry has the client, the pet, the appointment type, which vet if they care about that, and the date they were added.
+[02:59] Max: Great, and I can read that through the PMS API?
+[03:07] Dana: Yes, there's an API, the integrations team already reads appointments from it for the reminder texts. They can give you access.
+[03:21] Max: Perfect.
+[03:22] Dana: So the way I think about it is, when a slot frees up, we look at who's waiting, and we'd only offer it to people who are close by, because there's no point offering a ten o'clock slot to someone who can't get there.
+[03:46] Priya: Right, that makes sense.
+[03:50] Dana: And then it's the usual stuff. If they asked for a specific vet, we only offer them that vet's slots. If they said any vet, they can get any slot at that clinic.
+[04:08] Max: And the appointment type has to match? Like if they're waiting for a vaccine, they only get offered a slot that was, um, booked for a vaccine?
+[04:24] Dana: Well, the slot's not really a type, it's just time on the vet's calendar. Say a twenty minute slot with Doctor Okafor opens up at ten. Anyone waiting for something Doctor Okafor does could take it.
+[04:43] Max: Got it, so it's the vet's time, not the appointment type.
+[04:52] Dana: Exactly. And then, um, for the actual offer, we just send it to everybody on the waitlist at once and whoever says yes first gets the slot. That's what the front desk does on the phone, kind of, they just go down the list really fast.
+[05:14] Priya: Yeah.
+[05:16] Max: Okay. How long is the waitlist usually? Like how many people are on it at any one clinic?
+[05:29] Dana: Riverside's is long, it's like sixty, seventy people some weeks. Most clinics are twenty-ish.
+[05:38] Priya: And people stay on it until they get an appointment or they ask to come off. The front desk cleans it up once a month.
+[05:53] Max: Okay, cool. And once someone accepts, we just book it straight into the PMS? No one at the desk has to approve it?
+[06:05] Dana: No approval, just book it. The booking API does that already, it's the same call the online booking uses.
+[06:17] Max: Nice, so I can reuse that.
+[06:24] Priya: And it should show up in the vet's calendar like any other booking, with a little tag so we know it came from the waitlist, for reporting.
+[06:38] Dana: And the appointment types, so you know, they're all different lengths. Vaccines are fifteen minutes, a normal consult is twenty, dentals are like an hour, and the surgery consults are forty.
+[06:56] Max: Okay. I'll grab those from the PMS, I assume the durations are in there.
+[07:04] Dana: They are, yeah.
+[07:07] Priya: So, the text message. I was thinking something like, hi, a slot opened up with Doctor whoever at Riverside on Tuesday at ten, reply YES to book it.
+[07:24] Dana: That's good. Maybe the pet's name in there too, people like that.
+[07:32] Priya: Oh yeah, a slot opened up for Biscuit, that's cute. Okay.
+[07:40] Max: Do we need the client to confirm their phone number first, before we text them?
+[07:49] Dana: No, the numbers are verified when they register, we do the code thing at sign up. So everyone on the waitlist has a verified mobile.
+[08:03] Max: Okay, good.
+[08:05] Dana: And clients who've opted out of texts in the PMS, they never get these. That flag's already there, the reminders use it.
+[08:17] Priya: Yeah, that's a hard rule, legal was very clear about that.
+[08:26] Max: Makes sense. So I'd filter on the opt-out flag before anything else.
+[08:34] Dana: Right. And, oh, the reminder texts we already send, those go out on Tuesdays, sorry, Wednesdays, the day before, um, no, two days before. Anyway, the point is the SMS provider is already set up, it's the same account.
+[08:54] Max: Okay, so same provider, same sender number?
+[09:02] Dana: Same number, yeah. People recognise it.
+[09:07] Priya: Which helps, because people are a bit suspicious of random texts now.
+[09:16] Max: Is the reminder service something I can look at, code-wise? It might have the SMS sending bits I can reuse.
+[09:27] Dana: That's the integrations team again, I think it's theirs. Ask Sam.
+[09:35] Max: Okay, I'll ping Sam.
+[09:41] Dana: And obviously not for last-minute stuff, the front desk just phones people for those, it's quicker.
+[09:51] Priya: Yeah.
+[09:53] Max: Okay.
+[09:55] Priya: So, the flow in my head is, the slot frees up, the first person on the list gets the text, and if they haven't answered in fifteen minutes it moves on to the next person. And we keep going down the list until someone takes it or we run out of people.
+[10:21] Dana: Mm.
+[10:23] Priya: And for the order of the list, it's, I think we said, whoever's been waiting longest goes first. Date added.
+[10:35] Dana: Date added, yes. That's the fairest, and it's what the front desk is supposed to do.
+[10:46] Max: And that's just the date added field in the waitlist table.
+[10:52] Dana: Yep.
+[10:54] Priya: For the text itself, let's keep it under one SMS segment, so a hundred and sixty characters, because it gets expensive otherwise, and the long ones get split weird on some phones.
+[11:13] Max: Okay. With the vet name and the pet name and the clinic, that might get tight, but I'll see.
+[11:24] Priya: If it doesn't fit, drop the clinic name, they know which clinic they go to.
+[11:34] Dana: Mostly. Some people go to two, but fine.
+[11:39] Priya: Then reporting. Every Monday at eight, the clinic managers get an email with last week's numbers for their clinic: how many offers went out, how many were accepted, how many expired with no answer, and how many slots got filled in the end.
+[12:02] Dana: And by vet would be nice.
+[12:09] Priya: By vet, okay, so the same four numbers, broken down by vet. That's it for v1 reporting, we don't need a dashboard yet.
+[12:22] Max: Got it. Monday eight a.m., clinic's local time I guess, the four counts, by vet. That's easy, the tag on the booking gives me most of that.
+[12:38] Priya: Exactly.
+[12:40] Dana: Oh, and one thing, when I said close by earlier, I just mean they're on the waitlist for that clinic. We're not doing distance or postcodes or anything. Each clinic has its own list.
+[12:59] Priya: Oh, okay, good, I was picturing some map thing.
+[13:07] Dana: No, no map. Their clinic, that's it.
+[13:12] Max: Okay, that's much simpler, thanks.
+[13:18] Dana: Wait, sorry, Priya, going back, you said one at a time? I was picturing we text everyone at once.
+[13:29] Priya: I did say one at a time. I think blasting everyone is a bad experience though, like, ten people say yes and nine of them get told sorry, it's gone.
+[13:45] Dana: Hm. Yeah. Actually, that's true, we had complaints about exactly that at my old practice. Okay, one at a time is fine.
+[14:00] Priya: So one at a time, fifteen minutes each, in date added order.
+[14:07] Dana: Yes, one at a time, fifteen minutes each. I'm happy with that.
+[14:17] Max: Okay, I've got that.
+[14:20] Priya: Cool. Let me just check my notes. So we've got the matching, the text, the order, the reporting.
+[14:31] Dana: The front desk will want to see it happening, by the way. Like, if a client phones in and asks, the receptionist should be able to see that an offer went out.
+[14:50] Max: Is that in the PMS, or would that be something new we build?
+[14:58] Dana: The PMS has a notes field on the appointment, maybe just write a note there? Like, offered to Mrs Patel at nine forty, accepted at nine fifty.
+[15:14] Priya: That's a good v1. Just notes on the appointment.
+[15:20] Max: Okay, I'll write a note for each offer and each answer.
+[15:28] Dana: That'd be great, that's all they need really.
+[15:36] Priya: Later we might do the texts in Spanish too, for a couple of the clinics, but that's not now, that's definitely out of scope for this version.
+[15:50] Max: Okay, English only for now.
+[15:56] Priya: Yeah.
+[15:58] Dana: And, um, I guess the other thing, Max, you'll know better than me, but the reply, they just reply YES, right? We don't need them to click a link or log in?
+[16:16] Max: Reply YES works, the provider gives us the inbound messages.
+[16:25] Priya: Yeah, keep it simple. Reply YES and you're booked, and they get a confirmation text straight after.
+[16:35] Dana: With the time and the vet again, so they have it.
+[16:43] Priya: Yes, with the time and the vet.
+[16:48] Priya: Oh, and if someone replies yes after their fifteen minutes are up, we check if the slot's still free. If it is, they get it. If it's gone, they get a text saying sorry, it's been taken, and they keep their place on the waitlist.
+[17:12] Dana: Good, yes, they shouldn't lose their place for that.
+[17:20] Max: And if it's still free but we've already texted the next person?
+[17:28] Priya: Then whoever says yes first gets it, and the other one gets the sorry text.
+[17:38] Max: Okay, that works.
+[17:41] Dana: What about when it's the weekend? Do these go out on a Sunday?
+[17:50] Priya: Hm. The clinics are open Saturdays but not Sundays. I'd say no texts before eight in the morning or after eight at night, any day.
+[18:05] Dana: Eight to eight, yeah, that's what the reminders do too.
+[18:12] Max: Okay, so outside eight to eight the offer just waits?
+[18:20] Priya: It waits and goes out at eight. Unless the slot's already passed by then, obviously.
+[18:29] Max: Okay.
+[18:31] Priya: For rollout, I want to pilot it at Riverside first, because it's got the longest list. Two weeks, and if the numbers look good, we turn it on for the rest.
+[18:49] Dana: Riverside's manager is keen, she's been asking for this for ages.
+[18:56] Max: Is it a switch per clinic then? Like a setting we flip?
+[19:05] Priya: Yeah, a per-clinic on and off switch. Just for us to flip, the clinics don't need to see it.
+[19:16] Max: Okay, a config flag per clinic, admin only. That's easy.
+[19:24] Priya: And for the pilot, success is basically, the refill rate at Riverside goes from under a third to, I'd love half. If we get half I'll be very happy.
+[19:41] Dana: And no complaints. If clients start complaining about getting too many texts, that's a fail for me, even if the numbers are good.
+[19:54] Priya: Fair. So refill rate and complaints, and we look at both after two weeks.
+[20:04] Max: Do you want me to track complaints somehow, or is that just the front desk telling you?
+[20:13] Dana: Just the front desk. They'll tell me, believe me.
+[20:20] Priya: Ha, yeah. We don't need anything in the system for that.
+[20:30] Max: Okay.
+[20:31] Dana: I think that covers it from my side. I'll send over the list of appointment types and which vets do what, that's in a spreadsheet the managers keep.
+[20:48] Priya: Great. Max, does this feel buildable? Rough idea of size?
+[20:54] Max: Yeah, it feels pretty contained. Most of the pieces exist, the API, the SMS account, the booking call. I'll write it up and send a rough estimate by Thursday.
+[21:10] Priya: Perfect. And we can do a follow up next week for whatever's still open.
+[21:21] Dana: Sounds good. Thanks both.
+[21:25] Max: Thanks, see you.
