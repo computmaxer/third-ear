@@ -66,3 +66,7 @@ fixtures/gap-engine/   Sample meeting, its answer key and an offline script
 tests/                 Unit tests (node:test)
 docs/gap-engine.md     How the engine works
 ```
+
+## License
+
+[MIT](LICENSE)

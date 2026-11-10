@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "description": "A private meeting assistant that listens for what the group has not pinned down yet",
+  "license": "MIT",
   "type": "commonjs",
   "engines": {
     "node": ">=22.12"
